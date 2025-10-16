@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
 import { CodeEditor } from "@/components/CodeEditor";
 import { OutputConsole } from "@/components/OutputConsole";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Download } from "lucide-react";
 import { toast } from "sonner";
+import { loadPyodide, type PyodideInterface } from "pyodide";
 
 const DEFAULT_CODE = `# Welcome to PyteCode!
 # Write your Python code here and click Run
@@ -24,21 +25,65 @@ const Index = () => {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const pyodideRef = useRef<PyodideInterface | null>(null);
+
+  useEffect(() => {
+    const initPyodide = async () => {
+      try {
+        setOutput("Loading Python environment...");
+        pyodideRef.current = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
+        });
+        setOutput("Python environment ready! Run your code to see output.");
+        setIsLoading(false);
+        toast.success("Python environment loaded!");
+      } catch (error) {
+        setOutput(`Error loading Python: ${error}`);
+        setIsLoading(false);
+        toast.error("Failed to load Python environment");
+      }
+    };
+    initPyodide();
+  }, []);
 
   const handleRun = async () => {
-    setIsRunning(true);
-    toast.info("Executing code...");
-    
-    // Simulate code execution (in a real app, you'd use Pyodide or similar)
-    setTimeout(() => {
-      setOutput(`Hello, PyteCode! 🐍
-Squared numbers: [1, 4, 9, 16, 25]
+    if (!pyodideRef.current) {
+      toast.error("Python environment not ready yet");
+      return;
+    }
 
-Note: Python execution will be integrated in the next version.
-This is a UI preview of PyteCode.`);
-      setIsRunning(false);
+    setIsRunning(true);
+    setOutput("");
+    toast.info("Executing code...");
+
+    try {
+      const pyodide = pyodideRef.current;
+      
+      // Capture stdout and stderr
+      let outputBuffer = "";
+      pyodide.setStdout({
+        batched: (text) => {
+          outputBuffer += text + "\n";
+        },
+      });
+      pyodide.setStderr({
+        batched: (text) => {
+          outputBuffer += "Error: " + text + "\n";
+        },
+      });
+
+      // Run the Python code
+      await pyodide.runPythonAsync(code);
+      
+      setOutput(outputBuffer || "Code executed successfully with no output.");
       toast.success("Code executed!");
-    }, 1000);
+    } catch (error: any) {
+      setOutput(`Error:\n${error.message}`);
+      toast.error("Execution failed");
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleClear = () => {
@@ -70,12 +115,12 @@ This is a UI preview of PyteCode.`);
           <div className="flex gap-3">
             <Button 
               onClick={handleRun} 
-              disabled={isRunning}
+              disabled={isRunning || isLoading}
               size="lg"
               className="shadow-glow hover:shadow-glow/70 transition-all"
             >
               <Play className="w-4 h-4" />
-              {isRunning ? "Running..." : "Run Code"}
+              {isLoading ? "Loading..." : isRunning ? "Running..." : "Run Code"}
             </Button>
             <Button 
               variant="glass" 
