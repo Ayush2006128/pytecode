@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { CodeEditor } from "@/components/CodeEditor";
 import { OutputConsole } from "@/components/OutputConsole";
 import { Button } from "@/components/ui/button";
+import { usePWAInstall } from "@/hooks/use-pwa-install";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +45,7 @@ const Index = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const pyodideRef = useRef<PyodideInterface | null>(null);
+  const isInstalled = usePWAInstall();
 
   useEffect(() => {
     const initPyodide = async () => {
@@ -263,11 +265,13 @@ const Index = () => {
         </div>
 
           {/* Info Card */}
-          <div className="mt-6 p-4 rounded-2xl bg-gradient-primary backdrop-blur-glass border border-glass-border/30 shadow-glass">
-            <p className="text-sm text-center text-foreground/80">
-              💡 <strong>Tip:</strong> PyteCode is a Progressive Web App. Install it on your device for a native app experience!
-            </p>
-          </div>
+          {!isInstalled && (
+            <div className="mt-6 p-4 rounded-2xl bg-gradient-primary backdrop-blur-glass border border-glass-border/30 shadow-glass">
+              <p className="text-sm text-center text-foreground/80">
+                💡 <strong>Tip:</strong> PyteCode is a Progressive Web App. Install it on your device for a native app experience!
+              </p>
+            </div>
+          )}
         </TooltipProvider>
       </main>
     </div>

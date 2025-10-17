@@ -1,9 +1,11 @@
 import { Code2, Sparkles, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { usePWAInstall } from "@/hooks/use-pwa-install";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const isInstalled = usePWAInstall();
   
   return (
     <header className="relative">
@@ -28,14 +30,16 @@ export const Header = () => {
           <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 backdrop-blur-sm">
             <span className="text-xs font-medium text-primary">Beta</span>
           </div>
-          <Button 
-            variant="glass" 
-            size="sm"
-            onClick={() => navigate("/install")}
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Install</span>
-          </Button>
+          {!isInstalled && (
+            <Button 
+              variant="glass" 
+              size="sm"
+              onClick={() => navigate("/install")}
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Install</span>
+            </Button>
+          )}
         </div>
       </div>
     </header>
