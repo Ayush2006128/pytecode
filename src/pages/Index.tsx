@@ -3,6 +3,23 @@ import { Header } from "@/components/Header";
 import { CodeEditor } from "@/components/CodeEditor";
 import { OutputConsole } from "@/components/OutputConsole";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Play, RotateCcw, Download } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
@@ -102,6 +119,23 @@ const Index = () => {
     toast.success("Code reset to default!");
   };
 
+  const handleSave = () => {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const filename = `pytecode${day}${month}.py`;
+    
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    toast.success(`File saved as ${filename}`);
+  };
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Animated background gradients */}
@@ -114,42 +148,109 @@ const Index = () => {
       <Header />
 
       <main className="container mx-auto px-4 py-6">
-        {/* Control Panel */}
-        <div className="mb-6 flex flex-wrap gap-3 items-center justify-between">
-          <div className="flex gap-3">
-            <Button 
-              onClick={handleRun} 
-              disabled={isRunning || isLoading}
-              size="lg"
-              className="shadow-glow hover:shadow-glow/70 transition-all"
-            >
-              <Play className="w-4 h-4" />
-              {isLoading ? "Loading..." : isRunning ? "Running..." : "Run Code"}
-            </Button>
-            <Button 
-              variant="glass" 
-              onClick={handleReset}
-              size="lg"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Reset
-            </Button>
+        <TooltipProvider>
+          {/* Control Panel */}
+          <div className="mb-6 flex flex-wrap gap-3 items-center justify-between">
+            <div className="flex gap-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    onClick={handleRun} 
+                    disabled={isRunning || isLoading}
+                    size="lg"
+                    className="shadow-glow hover:shadow-glow/70 transition-all"
+                    aria-label="Run Python code"
+                  >
+                    <Play className="w-4 h-4" />
+                    {isLoading ? "Loading..." : isRunning ? "Running..." : "Run Code"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Execute your Python code</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <AlertDialog>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="glass" 
+                        size="lg"
+                        aria-label="Reset code to default"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Reset
+                      </Button>
+                    </AlertDialogTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Reset to default example code</p>
+                  </TooltipContent>
+                </Tooltip>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset to Default Code?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will replace your current code with the default example. Any unsaved changes will be lost.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleReset}>Reset</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+            
+            <div className="flex gap-3">
+              <AlertDialog>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="glass"
+                        aria-label="Clear all code"
+                      >
+                        Clear All
+                      </Button>
+                    </AlertDialogTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Clear all code and output</p>
+                  </TooltipContent>
+                </Tooltip>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Clear All Code?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will delete all your code and clear the output. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClear}>Clear All</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="secondary"
+                    onClick={handleSave}
+                    aria-label="Save code to file"
+                  >
+                    <Download className="w-4 h-4" />
+                    Save
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Download code as .py file</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
-          <div className="flex gap-3">
-            <Button 
-              variant="glass" 
-              onClick={handleClear}
-            >
-              Clear All
-            </Button>
-            <Button 
-              variant="secondary"
-            >
-              <Download className="w-4 h-4" />
-              Save
-            </Button>
-          </div>
-        </div>
 
         {/* Editor and Output Grid */}
         <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-220px)]">
@@ -161,12 +262,13 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Info Card */}
-        <div className="mt-6 p-4 rounded-2xl bg-gradient-primary backdrop-blur-glass border border-glass-border/30 shadow-glass">
-          <p className="text-sm text-center text-foreground/80">
-            💡 <strong>Tip:</strong> PyteCode is a Progressive Web App. Install it on your device for a native app experience!
-          </p>
-        </div>
+          {/* Info Card */}
+          <div className="mt-6 p-4 rounded-2xl bg-gradient-primary backdrop-blur-glass border border-glass-border/30 shadow-glass">
+            <p className="text-sm text-center text-foreground/80">
+              💡 <strong>Tip:</strong> PyteCode is a Progressive Web App. Install it on your device for a native app experience!
+            </p>
+          </div>
+        </TooltipProvider>
       </main>
     </div>
   );
