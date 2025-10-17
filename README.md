@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# PyteCode - Python Playground
 
-## Project info
+A modern, in-browser Python code editor and playground powered by Pyodide. Write, run, and experiment with Python code directly in your browser - no backend required!
 
-**URL**: https://lovable.dev/projects/75675fd6-ad7e-4a54-8b64-f7d3142560e0
+## ✨ Features
 
-## How can I edit this code?
+- 🐍 **Real Python Execution** - Run Python code directly in your browser using Pyodide
+- 📦 **Pre-loaded Libraries** - numpy and pandas are ready to use
+- 💾 **Code Saving** - Download your code as .py files with automatic date formatting
+- 🎨 **Beautiful UI** - Modern design with glass morphism effects and smooth animations
+- 📱 **Progressive Web App** - Install as a native app on any device
+- ⚡ **Fast & Responsive** - Monaco Editor for a VS Code-like editing experience
+- 🔒 **Privacy-First** - All code execution happens in your browser, nothing is sent to servers
 
-There are several ways of editing your application.
+## 🚀 Quick Start
 
-**Use Lovable**
+Simply visit the app and start coding! The Python environment loads automatically with numpy and pandas.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/75675fd6-ad7e-4a54-8b64-f7d3142560e0) and start prompting.
+### Controls
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Run Code** - Execute your Python code (Ctrl/Cmd + Enter)
+- **Reset** - Restore the default example code
+- **Clear All** - Remove all code and output
+- **Save** - Download your code as `pytecodeDDMM.py`
 
-**Use your preferred IDE**
+## 🛠️ Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **React** - UI framework
+- **TypeScript** - Type-safe development
+- **Vite** - Lightning-fast build tool
+- **Pyodide** - Python runtime for the browser
+- **Monaco Editor** - Professional code editor
+- **Tailwind CSS** - Utility-first styling
+- **shadcn/ui** - Beautiful UI components
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📦 Libraries Included
 
-Follow these steps:
+- **numpy** - Numerical computing
+- **pandas** - Data analysis and manipulation
+
+## 🏗️ Local Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📱 PWA Installation
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+PyteCode can be installed as a Progressive Web App on any device:
 
-**Use GitHub Codespaces**
+1. Visit the app in your browser
+2. Click the "Install" button in the header
+3. Follow your browser's installation prompts
+4. Launch PyteCode as a native app!
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎯 Use Cases
 
-## What technologies are used for this project?
+- **Learning Python** - Practice Python syntax and concepts
+- **Quick Prototyping** - Test code snippets without setting up an environment
+- **Data Analysis** - Experiment with numpy and pandas
+- **Code Sharing** - Save and share Python scripts
+- **Offline Coding** - Works offline after first load (PWA)
 
-This project is built with:
+## 🔧 Project Configuration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Built with Lovable's modern stack:
+- Vite for fast builds
+- TypeScript for type safety
+- React for reactive UI
+- Tailwind CSS for styling
+- PWA support for offline functionality
 
-## How can I deploy this project?
+## 📝 License
 
-Simply open [Lovable](https://lovable.dev/projects/75675fd6-ad7e-4a54-8b64-f7d3142560e0) and click on Share -> Publish.
+This project is built with Lovable.
 
-## Can I connect a custom domain to my Lovable project?
+## 🤝 Contributing
 
-Yes, you can!
+This is a Lovable project. To make changes:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. **Use Lovable** - Simply prompt in the [Lovable Project](https://lovable.dev/projects/75675fd6-ad7e-4a54-8b64-f7d3142560e0)
+2. **Use your IDE** - Clone, make changes, and push
+3. **Edit on GitHub** - Make changes directly in the browser
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🔗 Links
+
+- [Live App](https://lovable.dev/projects/75675fd6-ad7e-4a54-8b64-f7d3142560e0)
+- [Lovable Documentation](https://docs.lovable.dev)
+- [Pyodide Documentation](https://pyodide.org)
