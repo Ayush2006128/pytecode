@@ -35,9 +35,13 @@ const Index = () => {
         pyodideRef.current = await loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
         });
-        setOutput("Python environment ready! Run your code to see output.");
+        
+        setOutput("Loading libraries (numpy, pandas)...");
+        await pyodideRef.current.loadPackage(['numpy', 'pandas']);
+        
+        setOutput("Python environment ready! Libraries: numpy, pandas\nRun your code to see output.");
         setIsLoading(false);
-        toast.success("Python environment loaded!");
+        toast.success("Python environment loaded with numpy & pandas!");
       } catch (error) {
         setOutput(`Error loading Python: ${error}`);
         setIsLoading(false);
