@@ -207,7 +207,10 @@ const Index = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Execute your Python code</p>
+                  <p className="flex items-center gap-2">
+                    Execute your Python code
+                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Shift+Enter</kbd>
+                  </p>
                 </TooltipContent>
               </Tooltip>
 
@@ -226,7 +229,10 @@ const Index = () => {
                     </AlertDialogTrigger>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Reset to default example code</p>
+                    <p className="flex items-center gap-2">
+                      Reset to default example code
+                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Alt+R</kbd>
+                    </p>
                   </TooltipContent>
                 </Tooltip>
                 <AlertDialogContent>
@@ -258,7 +264,10 @@ const Index = () => {
                     </AlertDialogTrigger>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Clear all code and output</p>
+                    <p className="flex items-center gap-2">
+                      Clear all code and output
+                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Alt+Delete</kbd>
+                    </p>
                   </TooltipContent>
                 </Tooltip>
                 <AlertDialogContent>
@@ -287,7 +296,10 @@ const Index = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Download code as .py file</p>
+                  <p className="flex items-center gap-2">
+                    Download code as .py file
+                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Ctrl+S</kbd>
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </div>
