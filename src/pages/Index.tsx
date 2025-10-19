@@ -96,6 +96,14 @@ const Index = () => {
         },
       });
 
+      // Setup stdin to handle input() function
+      pyodide.setStdin({
+        stdin: () => {
+          const userInput = prompt("Enter input:");
+          return userInput !== null ? userInput : "";
+        },
+      });
+
       // Run the Python code
       await pyodide.runPythonAsync(code);
       
