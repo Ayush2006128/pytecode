@@ -26,6 +26,15 @@ export const CodeEditor = ({ value, onChange }: CodeEditorProps) => {
           cursorSmoothCaretAnimation: "on",
           smoothScrolling: true,
           fontLigatures: true,
+          // IntelliSense features
+          suggestOnTriggerCharacters: true,
+          quickSuggestions: true,
+          wordBasedSuggestions: "allDocuments",
+          parameterHints: { enabled: true },
+          autoClosingBrackets: "always",
+          autoClosingQuotes: "always",
+          formatOnPaste: true,
+          formatOnType: true,
         }}
       />
     </div>

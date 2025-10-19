@@ -70,6 +70,37 @@ const Index = () => {
     initPyodide();
   }, []);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Shift+Enter: Run code
+      if (e.shiftKey && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isRunning && !isLoading) {
+          handleRun();
+        }
+      }
+      // Alt+R: Reset
+      else if (e.altKey && e.key === 'r') {
+        e.preventDefault();
+        handleReset();
+      }
+      // Alt+Delete: Clear
+      else if (e.altKey && e.key === 'Delete') {
+        e.preventDefault();
+        handleClear();
+      }
+      // Ctrl+S: Save
+      else if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [code, isRunning, isLoading]);
+
   const handleRun = async () => {
     if (!pyodideRef.current) {
       toast.error("Python environment not ready yet");
