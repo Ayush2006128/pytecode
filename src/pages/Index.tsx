@@ -42,6 +42,7 @@ print(f"Squared numbers: {squared}")
 const Index = () => {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [output, setOutput] = useState("");
+  const [graphicsOutput, setGraphicsOutput] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const pyodideRef = useRef<PyodideInterface | null>(null);
@@ -55,12 +56,12 @@ const Index = () => {
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
         });
         
-        setOutput("Loading libraries (numpy, pandas)...");
-        await pyodideRef.current.loadPackage(['numpy', 'pandas']);
+        setOutput("Loading libraries (numpy, pandas, matplotlib)...");
+        await pyodideRef.current.loadPackage(['numpy', 'pandas', 'matplotlib']);
         
-        setOutput("Python environment ready! Libraries: numpy, pandas\nRun your code to see output.");
+        setOutput("Python environment ready! Libraries: numpy, pandas, matplotlib\nRun your code to see output.");
         setIsLoading(false);
-        toast.success("Python environment loaded with numpy & pandas!");
+        toast.success("Python environment loaded with numpy, pandas & matplotlib!");
       } catch (error) {
         setOutput(`Error loading Python: ${error}`);
         setIsLoading(false);
@@ -109,6 +110,7 @@ const Index = () => {
 
     setIsRunning(true);
     setOutput("");
+    setGraphicsOutput([]);
     toast.info("Executing code...");
 
     try {
@@ -135,8 +137,39 @@ const Index = () => {
         },
       });
 
+      // Setup matplotlib to capture plots
+      await pyodide.runPythonAsync(`
+import matplotlib
+import matplotlib.pyplot as plt
+import io
+import base64
+
+matplotlib.use('Agg')
+plt.clf()
+      `);
+
       // Run the Python code
       await pyodide.runPythonAsync(code);
+      
+      // Capture any matplotlib figures
+      const figures = await pyodide.runPythonAsync(`
+import matplotlib.pyplot as plt
+figures = []
+for i in plt.get_fignums():
+    fig = plt.figure(i)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    img_str = base64.b64encode(buf.read()).decode('utf-8')
+    figures.append(img_str)
+    buf.close()
+plt.close('all')
+figures
+      `);
+      
+      if (figures && figures.length > 0) {
+        setGraphicsOutput(figures.toJs());
+      }
       
       setOutput(outputBuffer || "Code executed successfully with no output.");
       toast.success("Code executed!");
@@ -151,12 +184,14 @@ const Index = () => {
   const handleClear = () => {
     setCode("");
     setOutput("");
+    setGraphicsOutput([]);
     toast.success("Editor cleared!");
   };
 
   const handleReset = () => {
     setCode(DEFAULT_CODE);
     setOutput("");
+    setGraphicsOutput([]);
     toast.success("Code reset to default!");
   };
 
@@ -311,7 +346,7 @@ const Index = () => {
             <CodeEditor value={code} onChange={setCode} />
           </div>
           <div className="h-full">
-            <OutputConsole output={output} />
+            <OutputConsole output={output} graphicsOutput={graphicsOutput} />
           </div>
         </div>
 
