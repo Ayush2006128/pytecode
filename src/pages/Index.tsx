@@ -56,12 +56,12 @@ const Index = () => {
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
         });
         
-        setOutput("Loading libraries (numpy, pandas, matplotlib)...");
-        await pyodideRef.current.loadPackage(['numpy', 'pandas', 'matplotlib']);
+        setOutput("Loading libraries (numpy, pandas, matplotlib, scipy, scikit-learn)...");
+        await pyodideRef.current.loadPackage(['numpy', 'pandas', 'matplotlib', 'scipy', 'scikit-learn']);
         
-        setOutput("Python environment ready! Libraries: numpy, pandas, matplotlib\nRun your code to see output.");
+        setOutput("Python environment ready! Libraries: numpy, pandas, matplotlib, scipy, scikit-learn\nRun your code to see output.");
         setIsLoading(false);
-        toast.success("Python environment loaded with numpy, pandas & matplotlib!");
+        toast.success("Python environment loaded with numpy, pandas, matplotlib, scipy & scikit-learn!");
       } catch (error) {
         setOutput(`Error loading Python: ${error}`);
         setIsLoading(false);
