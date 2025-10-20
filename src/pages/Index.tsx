@@ -16,6 +16,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -45,8 +52,22 @@ const Index = () => {
   const [graphicsOutput, setGraphicsOutput] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
   const pyodideRef = useRef<PyodideInterface | null>(null);
   const isInstalled = usePWAInstall();
+
+  // Check for first visit
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('pytecode-visited');
+    if (!hasVisited) {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  const handleCloseWelcome = () => {
+    localStorage.setItem('pytecode-visited', 'true');
+    setShowWelcome(false);
+  };
 
   useEffect(() => {
     const initPyodide = async () => {
@@ -222,6 +243,39 @@ figures
       </div>
 
       <Header />
+
+      {/* Welcome Dialog */}
+      <Dialog open={showWelcome} onOpenChange={handleCloseWelcome}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Welcome to PyteCode! 🐍</DialogTitle>
+            <DialogDescription className="text-base space-y-4 pt-4">
+              <p>
+                PyteCode is a powerful Python IDE that runs entirely in your browser. 
+                Write, execute, and visualize Python code with zero setup required.
+              </p>
+              
+              <div className="space-y-2">
+                <p className="font-semibold text-foreground">Key Features:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>Pre-loaded Libraries:</strong> NumPy, Pandas, Matplotlib, SciPy, and Scikit-learn ready to use</li>
+                  <li><strong>Data Visualization:</strong> Create beautiful charts with Matplotlib</li>
+                  <li><strong>Smart Editor:</strong> Syntax highlighting and auto-completion powered by Monaco</li>
+                  <li><strong>Keyboard Shortcuts:</strong> Shift+Enter to run, Alt+R to reset, Ctrl+S to save</li>
+                  <li><strong>Progressive Web App:</strong> Install for offline access and native app experience</li>
+                </ul>
+              </div>
+
+              <p className="text-sm pt-2">
+                Ready to start coding? Try the example code or write your own Python scripts!
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end">
+            <Button onClick={handleCloseWelcome}>Get Started</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <main className="container mx-auto px-4 py-6">
         <TooltipProvider>
