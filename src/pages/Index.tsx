@@ -67,17 +67,15 @@ const Index = () => {
   const isInstalled = usePWAInstall();
   const [pyodideReady, setPyodideReady] = useState(false);
 
-  // Check for first visit
+  // Show welcome dialog on every visit
   useEffect(() => {
-    const hasVisited = localStorage.getItem('pytecode-visited');
-    if (!hasVisited) {
-      setShowWelcome(true);
-      setIsLoading(false); // Don't auto-load Python until user selects libraries
-    } else {
-      // For returning users, load with previously selected libraries or default to all
-      const savedLibs = localStorage.getItem('pytecode-libraries');
-      const libs = savedLibs ? JSON.parse(savedLibs) : AVAILABLE_LIBRARIES.map(lib => lib.id);
-      setSelectedLibraries(libs);
+    setShowWelcome(true);
+    setIsLoading(false); // Don't auto-load Python until user selects libraries
+    
+    // Load previously selected libraries if any
+    const savedLibs = localStorage.getItem('pytecode-libraries');
+    if (savedLibs) {
+      setSelectedLibraries(JSON.parse(savedLibs));
     }
   }, []);
 
@@ -90,7 +88,6 @@ const Index = () => {
   };
 
   const handleStartCoding = () => {
-    localStorage.setItem('pytecode-visited', 'true');
     localStorage.setItem('pytecode-libraries', JSON.stringify(selectedLibraries));
     setShowWelcome(false);
   };
