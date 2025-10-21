@@ -28,7 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Play, RotateCcw, Download } from "lucide-react";
+import { Play, RotateCcw, Download, FileCode2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
 
@@ -248,7 +248,10 @@ figures
       <Dialog open={showWelcome} onOpenChange={handleCloseWelcome}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">Welcome to PyteCode! 🐍</DialogTitle>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <FileCode2 className="w-6 h-6 text-primary" />
+              Welcome to PyteCode!
+            </DialogTitle>
             <DialogDescription className="text-base space-y-4 pt-4">
               <p>
                 PyteCode is a powerful Python IDE that runs entirely in your browser. 
