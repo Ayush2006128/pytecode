@@ -31,6 +31,15 @@ import {
 import { Play, RotateCcw, Download, FileCode2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const AVAILABLE_LIBRARIES = [
+  { id: 'numpy', name: 'NumPy', description: 'Numerical computing' },
+  { id: 'pandas', name: 'Pandas', description: 'Data manipulation and analysis' },
+  { id: 'matplotlib', name: 'Matplotlib', description: 'Data visualization' },
+  { id: 'scipy', name: 'SciPy', description: 'Scientific computing' },
+  { id: 'scikit-learn', name: 'Scikit-learn', description: 'Machine learning' },
+] as const;
 
 const DEFAULT_CODE = `# Welcome to PyteCode!
 # Write your Python code here and click Run
@@ -53,36 +62,67 @@ const Index = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [selectedLibraries, setSelectedLibraries] = useState<string[]>([]);
   const pyodideRef = useRef<PyodideInterface | null>(null);
   const isInstalled = usePWAInstall();
+  const [pyodideReady, setPyodideReady] = useState(false);
 
   // Check for first visit
   useEffect(() => {
     const hasVisited = localStorage.getItem('pytecode-visited');
     if (!hasVisited) {
       setShowWelcome(true);
+      setIsLoading(false); // Don't auto-load Python until user selects libraries
+    } else {
+      // For returning users, load with previously selected libraries or default to all
+      const savedLibs = localStorage.getItem('pytecode-libraries');
+      const libs = savedLibs ? JSON.parse(savedLibs) : AVAILABLE_LIBRARIES.map(lib => lib.id);
+      setSelectedLibraries(libs);
     }
   }, []);
 
-  const handleCloseWelcome = () => {
+  const handleToggleLibrary = (libraryId: string) => {
+    setSelectedLibraries(prev => 
+      prev.includes(libraryId) 
+        ? prev.filter(id => id !== libraryId)
+        : [...prev, libraryId]
+    );
+  };
+
+  const handleStartCoding = () => {
     localStorage.setItem('pytecode-visited', 'true');
+    localStorage.setItem('pytecode-libraries', JSON.stringify(selectedLibraries));
     setShowWelcome(false);
   };
 
   useEffect(() => {
+    if (selectedLibraries.length === 0 || pyodideReady) return;
+
     const initPyodide = async () => {
       try {
+        setIsLoading(true);
         setOutput("Loading Python environment...");
         pyodideRef.current = await loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
         });
         
-        setOutput("Loading libraries (numpy, pandas, matplotlib, scipy, scikit-learn)...");
-        await pyodideRef.current.loadPackage(['numpy', 'pandas', 'matplotlib', 'scipy', 'scikit-learn']);
+        if (selectedLibraries.length > 0) {
+          const libNames = selectedLibraries.map(id => 
+            AVAILABLE_LIBRARIES.find(lib => lib.id === id)?.name
+          ).filter(Boolean).join(', ');
+          
+          setOutput(`Loading libraries (${libNames})...`);
+          await pyodideRef.current.loadPackage(selectedLibraries);
+          
+          setOutput(`Python environment ready! Libraries: ${libNames}\nRun your code to see output.`);
+          toast.success(`Python loaded with ${libNames}!`);
+        } else {
+          setOutput("Python environment ready! No additional libraries loaded.\nRun your code to see output.");
+          toast.success("Python environment loaded!");
+        }
         
-        setOutput("Python environment ready! Libraries: numpy, pandas, matplotlib, scipy, scikit-learn\nRun your code to see output.");
         setIsLoading(false);
-        toast.success("Python environment loaded with numpy, pandas, matplotlib, scipy & scikit-learn!");
+        setPyodideReady(true);
       } catch (error) {
         setOutput(`Error loading Python: ${error}`);
         setIsLoading(false);
@@ -90,7 +130,7 @@ const Index = () => {
       }
     };
     initPyodide();
-  }, []);
+  }, [selectedLibraries, pyodideReady]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -245,7 +285,7 @@ figures
       <Header />
 
       {/* Welcome Dialog */}
-      <Dialog open={showWelcome} onOpenChange={handleCloseWelcome}>
+      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl flex items-center gap-2">
@@ -258,24 +298,58 @@ figures
                 Write, execute, and visualize Python code with zero setup required.
               </p>
               
-              <div className="space-y-2">
-                <p className="font-semibold text-foreground">Key Features:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li><strong>Pre-loaded Libraries:</strong> NumPy, Pandas, Matplotlib, SciPy, and Scikit-learn ready to use</li>
-                  <li><strong>Data Visualization:</strong> Create beautiful charts with Matplotlib</li>
-                  <li><strong>Smart Editor:</strong> Syntax highlighting and auto-completion powered by Monaco</li>
-                  <li><strong>Keyboard Shortcuts:</strong> Shift+Enter to run, Alt+R to reset, Ctrl+S to save</li>
-                  <li><strong>Progressive Web App:</strong> Install for offline access and native app experience</li>
-                </ul>
+              <div className="space-y-3">
+                <p className="font-semibold text-foreground">Select Python Libraries to Load:</p>
+                <p className="text-sm text-muted-foreground">
+                  Choose which libraries you want to use. Loading only what you need keeps things fast!
+                </p>
+                <div className="space-y-2 border border-border rounded-lg p-4 bg-muted/30">
+                  {AVAILABLE_LIBRARIES.map((library) => (
+                    <div key={library.id} className="flex items-start space-x-3 py-2">
+                      <Checkbox
+                        id={library.id}
+                        checked={selectedLibraries.includes(library.id)}
+                        onCheckedChange={() => handleToggleLibrary(library.id)}
+                      />
+                      <div className="grid gap-1 leading-none">
+                        <label
+                          htmlFor={library.id}
+                          className="text-sm font-medium text-foreground cursor-pointer"
+                        >
+                          {library.name}
+                        </label>
+                        <p className="text-xs text-muted-foreground">
+                          {library.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="space-y-2 pt-2">
+                  <p className="font-semibold text-foreground">Other Features:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
+                    <li><strong>Smart Editor:</strong> Syntax highlighting and auto-completion</li>
+                    <li><strong>Keyboard Shortcuts:</strong> Shift+Enter to run, Alt+R to reset, Ctrl+S to save</li>
+                    <li><strong>Progressive Web App:</strong> Install for offline access</li>
+                  </ul>
+                </div>
               </div>
-
-              <p className="text-sm pt-2">
-                Ready to start coding? Try the example code or write your own Python scripts!
-              </p>
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end">
-            <Button onClick={handleCloseWelcome}>Get Started</Button>
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedLibraries(AVAILABLE_LIBRARIES.map(lib => lib.id))}
+            >
+              Select All
+            </Button>
+            <Button 
+              onClick={handleStartCoding}
+              disabled={selectedLibraries.length === 0}
+            >
+              Start Coding
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
