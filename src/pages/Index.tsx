@@ -70,7 +70,7 @@ const Index = () => {
   // Show welcome dialog on every visit
   useEffect(() => {
     setShowWelcome(true);
-    setIsLoading(false); // Don't auto-load Python until user selects libraries
+    setIsLoading(false);
     
     // Load previously selected libraries if any
     const savedLibs = localStorage.getItem('pytecode-libraries');
@@ -79,16 +79,7 @@ const Index = () => {
     }
   }, []);
 
-  const handleToggleLibrary = (libraryId: string) => {
-    setSelectedLibraries(prev => 
-      prev.includes(libraryId) 
-        ? prev.filter(id => id !== libraryId)
-        : [...prev, libraryId]
-    );
-  };
-
   const handleStartCoding = () => {
-    localStorage.setItem('pytecode-libraries', JSON.stringify(selectedLibraries));
     setShowWelcome(false);
   };
 
@@ -270,6 +261,10 @@ figures
     toast.success(`File saved as ${filename}`);
   };
 
+  const handleLibrariesChange = (libraries: string[]) => {
+    setSelectedLibraries(libraries);
+  };
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Animated background gradients */}
@@ -279,7 +274,10 @@ figures
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl animate-glow" />
       </div>
 
-      <Header />
+      <Header 
+        selectedLibraries={selectedLibraries}
+        onLibrariesChange={handleLibrariesChange}
+      />
 
       {/* Welcome Dialog */}
       <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
@@ -296,55 +294,19 @@ figures
               </p>
               
               <div className="space-y-3">
-                <p className="font-semibold text-foreground">Select Python Libraries to Load:</p>
-                <p className="text-sm text-muted-foreground">
-                  Choose which libraries you want to use. Loading only what you need keeps things fast!
-                </p>
-                <div className="space-y-2 border border-border rounded-lg p-4 bg-muted/30">
-                  {AVAILABLE_LIBRARIES.map((library) => (
-                    <div key={library.id} className="flex items-start space-x-3 py-2">
-                      <Checkbox
-                        id={library.id}
-                        checked={selectedLibraries.includes(library.id)}
-                        onCheckedChange={() => handleToggleLibrary(library.id)}
-                      />
-                      <div className="grid gap-1 leading-none">
-                        <label
-                          htmlFor={library.id}
-                          className="text-sm font-medium text-foreground cursor-pointer"
-                        >
-                          {library.name}
-                        </label>
-                        <p className="text-xs text-muted-foreground">
-                          {library.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="space-y-2 pt-2">
-                  <p className="font-semibold text-foreground">Other Features:</p>
-                  <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
-                    <li><strong>Smart Editor:</strong> Syntax highlighting and auto-completion</li>
-                    <li><strong>Keyboard Shortcuts:</strong> Shift+Enter to run, Alt+R to reset, Ctrl+S to save</li>
-                    <li><strong>Progressive Web App:</strong> Install for offline access</li>
-                  </ul>
-                </div>
+                <p className="font-semibold text-foreground">Key Features:</p>
+                <ul className="list-disc list-inside space-y-2 ml-2 text-sm">
+                  <li><strong>Smart Editor:</strong> Syntax highlighting and auto-completion</li>
+                  <li><strong>Python Libraries:</strong> Use the settings menu (⚙️) to load NumPy, Pandas, Matplotlib, and more</li>
+                  <li><strong>Keyboard Shortcuts:</strong> Shift+Enter to run, Alt+R to reset, Ctrl+S to save</li>
+                  <li><strong>Progressive Web App:</strong> Install for offline access</li>
+                  <li><strong>Theme Options:</strong> Switch between light, dark, and system themes</li>
+                </ul>
               </div>
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => setSelectedLibraries(AVAILABLE_LIBRARIES.map(lib => lib.id))}
-            >
-              Select All
-            </Button>
-            <Button 
-              onClick={handleStartCoding}
-              disabled={selectedLibraries.length === 0}
-            >
+          <div className="flex justify-end">
+            <Button onClick={handleStartCoding}>
               Start Coding
             </Button>
           </div>

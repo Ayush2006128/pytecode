@@ -2,8 +2,14 @@ import { FileCode2, Sparkles, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
+import { Settings } from "@/components/Settings";
 
-export const Header = () => {
+interface HeaderProps {
+  selectedLibraries?: string[];
+  onLibrariesChange?: (libraries: string[]) => void;
+}
+
+export const Header = ({ selectedLibraries = [], onLibrariesChange }: HeaderProps) => {
   const navigate = useNavigate();
   const isInstalled = usePWAInstall();
   
@@ -39,6 +45,12 @@ export const Header = () => {
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Install</span>
             </Button>
+          )}
+          {onLibrariesChange && (
+            <Settings 
+              selectedLibraries={selectedLibraries} 
+              onLibrariesChange={onLibrariesChange}
+            />
           )}
         </div>
       </div>
