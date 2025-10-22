@@ -28,10 +28,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Play, RotateCcw, Download, FileCode2 } from "lucide-react";
+import { Play, RotateCcw, Download } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PythonLogo } from "@/components/PythonLogo";
 
 const AVAILABLE_LIBRARIES = [
   { id: 'numpy', name: 'NumPy', description: 'Numerical computing' },
@@ -283,8 +284,8 @@ figures
       <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-2">
-              <FileCode2 className="w-6 h-6 text-primary" />
+            <DialogTitle className="text-2xl flex items-center gap-3">
+              <PythonLogo size={28} />
               Welcome to PyteCode!
             </DialogTitle>
             <DialogDescription className="text-base space-y-4 pt-4">

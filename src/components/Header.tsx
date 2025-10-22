@@ -1,8 +1,9 @@
-import { FileCode2, Sparkles, Download } from "lucide-react";
+import { Sparkles, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
 import { Settings } from "@/components/Settings";
+import { PythonLogo } from "@/components/PythonLogo";
 
 interface HeaderProps {
   selectedLibraries?: string[];
@@ -21,7 +22,7 @@ export const Header = ({ selectedLibraries = [], onLibrariesChange }: HeaderProp
           <div className="relative">
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
             <div className="relative bg-gradient-primary p-2 rounded-xl border border-glass-border/50 shadow-glow">
-              <FileCode2 className="w-6 h-6 text-primary" />
+              <PythonLogo size={24} />
             </div>
           </div>
           <div>
