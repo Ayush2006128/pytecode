@@ -8,6 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 220 25% 8%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 220 25% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 8%;
+
+    --primary: 180 85% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 75% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 20% 96%;
+    --muted-foreground: 220 20% 40%;
+
+    --accent: 280 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 85%;
+    --input: 220 20% 90%;
+    --ring: 180 85% 45%;
+
+    --radius: 1rem;
+
+    /* Glass effect colors */
+    --glass-bg: 0 0% 95%;
+    --glass-border: 180 50% 50%;
+    --glass-shadow: 180 85% 55%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(180 85% 45% / 0.15), hsl(260 75% 55% / 0.15));
+    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(180 85% 45% / 0.1), transparent 70%);
+    
+    /* Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .dark {
     --background: 220 25% 8%;
     --foreground: 180 100% 95%;
 
@@ -36,8 +81,6 @@ All colors MUST be HSL.
     --input: 220 20% 15%;
     --ring: 180 85% 55%;
 
-    --radius: 1rem;
-
     /* Glass effect colors */
     --glass-bg: 220 25% 15%;
     --glass-border: 180 50% 50%;
@@ -46,10 +89,6 @@ All colors MUST be HSL.
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(180 85% 55% / 0.2), hsl(260 75% 60% / 0.2));
     --gradient-glow: radial-gradient(circle at 50% 50%, hsl(180 85% 55% / 0.15), transparent 70%);
-    
-    /* Animations */
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 

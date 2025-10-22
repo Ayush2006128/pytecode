@@ -1,5 +1,6 @@
 import { Editor } from "@monaco-editor/react";
 import { useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 
 interface CodeEditorProps {
   value: string;
@@ -8,6 +9,7 @@ interface CodeEditorProps {
 
 export const CodeEditor = ({ value, onChange }: CodeEditorProps) => {
   const editorRef = useRef<any>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     // Configure Monaco for Python LSP-like features
@@ -90,7 +92,7 @@ export const CodeEditor = ({ value, onChange }: CodeEditorProps) => {
         value={value}
         onChange={(value) => onChange(value || "")}
         onMount={handleEditorDidMount}
-        theme="vs-dark"
+        theme={theme === "light" ? "vs-light" : "vs-dark"}
         options={{
           fontSize: 14,
           fontFamily: "'JetBrains Mono', monospace",
