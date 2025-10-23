@@ -7,6 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -35,6 +41,7 @@ export const Settings = ({ selectedLibraries, onLibrariesChange }: SettingsProps
   const [showLibraries, setShowLibraries] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
   const [tempLibraries, setTempLibraries] = useState<string[]>(selectedLibraries);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { theme, setTheme } = useTheme();
 
   const handleToggleLibrary = (libraryId: string) => {
@@ -59,13 +66,25 @@ export const Settings = ({ selectedLibraries, onLibrariesChange }: SettingsProps
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="glass" size="sm" aria-label="Settings">
-            <SettingsIcon className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 bg-popover/95 backdrop-blur-lg border-border z-50">
+      <TooltipProvider>
+        <DropdownMenu onOpenChange={setIsDropdownOpen}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="glass" size="sm" aria-label="Settings">
+                  <SettingsIcon 
+                    className={`w-4 h-4 transition-transform duration-300 ${
+                      isDropdownOpen ? 'rotate-[-90deg]' : 'rotate-0'
+                    }`}
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Settings</p>
+            </TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end" className="w-56 bg-popover/95 backdrop-blur-lg border-border z-50">
           <DropdownMenuItem onClick={handleOpenLibraries} className="cursor-pointer">
             <Package className="w-4 h-4 mr-2" />
             Manage Libraries
@@ -76,6 +95,7 @@ export const Settings = ({ selectedLibraries, onLibrariesChange }: SettingsProps
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </TooltipProvider>
 
       {/* Library Management Dialog */}
       <Dialog open={showLibraries} onOpenChange={setShowLibraries}>
