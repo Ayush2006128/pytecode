@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Package, Palette } from "lucide-react";
+import { Settings as SettingsIcon, Package, Palette, Sun, Moon, LaptopMinimalCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -175,7 +175,7 @@ export const Settings = ({ selectedLibraries, onLibrariesChange }: SettingsProps
                     setShowTheme(false);
                   }}
                 >
-                  ☀️ Light Theme
+                  <Sun/> Light Theme
                 </Button>
                 <Button
                   variant={theme === "dark" ? "default" : "outline"}
@@ -186,7 +186,7 @@ export const Settings = ({ selectedLibraries, onLibrariesChange }: SettingsProps
                     setShowTheme(false);
                   }}
                 >
-                  🌙 Dark Theme
+                  <Moon/> Dark Theme
                 </Button>
                 <Button
                   variant={theme === "system" ? "default" : "outline"}
@@ -197,7 +197,7 @@ export const Settings = ({ selectedLibraries, onLibrariesChange }: SettingsProps
                     setShowTheme(false);
                   }}
                 >
-                  💻 System Theme
+                   <LaptopMinimalCheck /> System Theme
                 </Button>
               </div>
             </DialogDescription>
