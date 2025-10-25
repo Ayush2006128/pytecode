@@ -15,6 +15,27 @@ export const pwaConfig: Partial<VitePWAOptions> = {
     start_url: '/',
     categories: ['education', 'productivity', 'development'],
     display_override: ['window-controls-overlay', 'standalone', 'minimal-ui', 'fullscreen'],
+    shortcuts: [
+      {
+        name: 'New Playground',
+        short_name: 'New',
+        description: 'Create a new Python playground',
+        url: '/',
+        icons: [
+          {
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+        ],
+      },
+    ],
+    related_applications: [
+      {
+        platform: 'web',
+        url: 'https://pytecode.vercel.app',
+      },
+    ],
     icons: [
       {
         src: '/pwa-192x192.png',
