@@ -28,11 +28,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Play, RotateCcw, Download } from "lucide-react";
+import { Play, RotateCcw, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
-import { Checkbox } from "@/components/ui/checkbox";
-import { PythonLogo } from "@/components/PythonLogo";
+import PythonLogo from "@/assets/PythonLogo.svg";
 
 const AVAILABLE_LIBRARIES = [
   { id: 'numpy', name: 'NumPy', description: 'Numerical computing' },
@@ -285,7 +284,7 @@ figures
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl flex items-center gap-3">
-              <PythonLogo size={28} />
+              <img src={PythonLogo} alt="Python Logo" className="w-6 h-6" />
               Welcome to PyteCode!
             </DialogTitle>
             <DialogDescription className="text-base space-y-4 pt-4">
@@ -385,7 +384,7 @@ figures
                         variant="glass"
                         aria-label="Clear all code"
                       >
-                        Clear All
+                        <Trash2 className="w-4 h-4"/> Clear All
                       </Button>
                     </AlertDialogTrigger>
                   </TooltipTrigger>
