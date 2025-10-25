@@ -6,18 +6,26 @@ export const pwaConfig: Partial<VitePWAOptions> = {
   manifest: {
     name: 'PyteCode - Python Playground',
     short_name: 'PyteCode',
-    description: 'Interactive Python playground with liquid glass design',
+    description: 'Interactive Python playground with data science libraries support and work on mobile devices.',
     theme_color: '#0F172A',
     background_color: '#0F172A',
     display: 'standalone',
     orientation: 'portrait',
     scope: '/',
     start_url: '/',
+    categories: ['education', 'productivity', 'development'],
+    display_override: ['window-controls-overlay', 'standalone', 'minimal-ui', 'fullscreen'],
     icons: [
       {
         src: '/pwa-192x192.png',
         sizes: '192x192',
         type: 'image/png',
+      },
+      {
+        src: '/pwa-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any maskable',
       },
       {
         src: '/pwa-512x512.png',
