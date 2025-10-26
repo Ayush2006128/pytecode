@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "muley.ayush.pytecode",
+      "sha256_cert_fingerprints": [
+        "BD:52:D3:6B:E0:81:C9:FB:C8:2D:45:49:D3:30:74:FC:CD:E9:A3:04:A3:A8:5A:36:C8:57:66:57:5B:C3:E8:2A"
+      ]
+    }
+  }
+]
+

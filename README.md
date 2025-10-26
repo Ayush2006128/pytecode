@@ -63,6 +63,39 @@ PyteCode can be installed as a Progressive Web App on any device:
 3. Follow your browser's installation prompts
 4. Launch PyteCode as a native app!
 
+## 🤖 TWA (Trusted Web Activity) Setup
+
+PyteCode includes support for Android Trusted Web Activity (TWA). The `assetlinks.json` file has been created at `public/.well-known/assetlinks.json`.
+
+### To configure your TWA:
+
+1. **Update the assetlinks.json file** with your Android app details:
+   - Replace `com.yourcompany.pytecode` with your actual Android package name
+   - Replace `YOUR_SHA256_FINGERPRINT_HERE` with your app's SHA-256 certificate fingerprint
+
+2. **Get your SHA-256 fingerprint:**
+   ```bash
+   # For debug keystore
+   keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+   
+   # For release keystore
+   keytool -list -v -keystore your-release-key.keystore -alias your-key-alias
+   ```
+
+3. **The file will be automatically served at:**
+   `https://yourdomain.com/.well-known/assetlinks.json`
+
+4. **Test your asset links:**
+   ```bash
+   digital assetlinks validate \
+     --site https://yourdomain.com \
+     --app com.yourcompany.pytecode
+   ```
+
+5. **For Chrome on Android, ensure Digital Asset Links are verified:**
+   - Your Android app must reference your web app's URL
+   - The digital asset links file must be accessible and valid
+
 ## 🎯 Use Cases
 
 - **Learning Python** - Practice Python syntax and concepts
