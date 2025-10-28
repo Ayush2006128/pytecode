@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PyteCode</string>
+    <string name="title_activity_main">PyteCode</string>
+    <string name="package_name">muley.ayush.pytecode</string>
+    <string name="custom_url_scheme">muley.ayush.pytecode</string>
+</resources>

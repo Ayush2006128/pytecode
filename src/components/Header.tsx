@@ -4,16 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
 import { Settings } from "@/components/Settings";
 import { PythonLogo } from "@/components/PythonLogo";
+import { Capacitor } from "@capacitor/core";
 
 interface HeaderProps {
   selectedLibraries?: string[];
   onLibrariesChange?: (libraries: string[]) => void;
 }
 
-export const Header = ({ selectedLibraries = [], onLibrariesChange }: HeaderProps) => {
+export const Header = ({
+  selectedLibraries = [],
+  onLibrariesChange,
+}: HeaderProps) => {
   const navigate = useNavigate();
   const isInstalled = usePWAInstall();
-  
+
   return (
     <header className="relative">
       <div className="absolute inset-0 bg-gradient-glow animate-glow opacity-30" />
@@ -37,9 +41,9 @@ export const Header = ({ selectedLibraries = [], onLibrariesChange }: HeaderProp
           <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 backdrop-blur-sm">
             <span className="text-xs font-medium text-primary">Beta</span>
           </div>
-          {!isInstalled && (
-            <Button 
-              variant="glass" 
+          {!isInstalled && Capacitor.getPlatform() !== "android" && (
+            <Button
+              variant="glass"
               size="sm"
               onClick={() => navigate("/install")}
             >
@@ -48,8 +52,8 @@ export const Header = ({ selectedLibraries = [], onLibrariesChange }: HeaderProp
             </Button>
           )}
           {onLibrariesChange && (
-            <Settings 
-              selectedLibraries={selectedLibraries} 
+            <Settings
+              selectedLibraries={selectedLibraries}
               onLibrariesChange={onLibrariesChange}
             />
           )}

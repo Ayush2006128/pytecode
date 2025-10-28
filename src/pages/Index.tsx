@@ -16,13 +16,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -31,14 +24,20 @@ import {
 import { Play, RotateCcw, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
-import PythonLogo from "@/assets/PythonLogo.svg";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import WelcomeDialog from "@/components/WelcomeDialog";
 
 const AVAILABLE_LIBRARIES = [
-  { id: 'numpy', name: 'NumPy', description: 'Numerical computing' },
-  { id: 'pandas', name: 'Pandas', description: 'Data manipulation and analysis' },
-  { id: 'matplotlib', name: 'Matplotlib', description: 'Data visualization' },
-  { id: 'scipy', name: 'SciPy', description: 'Scientific computing' },
-  { id: 'scikit-learn', name: 'Scikit-learn', description: 'Machine learning' },
+  { id: "numpy", name: "NumPy", description: "Numerical computing" },
+  {
+    id: "pandas",
+    name: "Pandas",
+    description: "Data manipulation and analysis",
+  },
+  { id: "matplotlib", name: "Matplotlib", description: "Data visualization" },
+  { id: "scipy", name: "SciPy", description: "Scientific computing" },
+  { id: "scikit-learn", name: "Scikit-learn", description: "Machine learning" },
 ] as const;
 
 const DEFAULT_CODE = `# Welcome to PyteCode!
@@ -71,9 +70,9 @@ const Index = () => {
   useEffect(() => {
     setShowWelcome(true);
     setIsLoading(false);
-    
+
     // Load previously selected libraries if any
-    const savedLibs = localStorage.getItem('pytecode-libraries');
+    const savedLibs = localStorage.getItem("pytecode-libraries");
     if (savedLibs) {
       setSelectedLibraries(JSON.parse(savedLibs));
     }
@@ -93,22 +92,27 @@ const Index = () => {
         pyodideRef.current = await loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
         });
-        
+
         if (selectedLibraries.length > 0) {
-          const libNames = selectedLibraries.map(id => 
-            AVAILABLE_LIBRARIES.find(lib => lib.id === id)?.name
-          ).filter(Boolean).join(', ');
-          
+          const libNames = selectedLibraries
+            .map((id) => AVAILABLE_LIBRARIES.find((lib) => lib.id === id)?.name)
+            .filter(Boolean)
+            .join(", ");
+
           setOutput(`Loading libraries (${libNames})...`);
           await pyodideRef.current.loadPackage(selectedLibraries);
-          
-          setOutput(`Python environment ready! Libraries: ${libNames}\nRun your code to see output.`);
+
+          setOutput(
+            `Python environment ready! Libraries: ${libNames}\nRun your code to see output.`,
+          );
           toast.success(`Python loaded with ${libNames}!`);
         } else {
-          setOutput("Python environment ready! No additional libraries loaded.\nRun your code to see output.");
+          setOutput(
+            "Python environment ready! No additional libraries loaded.\nRun your code to see output.",
+          );
           toast.success("Python environment loaded!");
         }
-        
+
         setIsLoading(false);
         setPyodideReady(true);
       } catch (error) {
@@ -124,31 +128,31 @@ const Index = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Shift+Enter: Run code
-      if (e.shiftKey && e.key === 'Enter') {
+      if (e.shiftKey && e.key === "Enter") {
         e.preventDefault();
         if (!isRunning && !isLoading) {
           handleRun();
         }
       }
       // Alt+R: Reset
-      else if (e.altKey && e.key === 'r') {
+      else if (e.altKey && e.key === "r") {
         e.preventDefault();
         handleReset();
       }
       // Alt+Delete: Clear
-      else if (e.altKey && e.key === 'Delete') {
+      else if (e.altKey && e.key === "Delete") {
         e.preventDefault();
         handleClear();
       }
       // Ctrl+S: Save
-      else if (e.ctrlKey && e.key === 's') {
+      else if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         handleSave();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [code, isRunning, isLoading]);
 
   const handleRun = async () => {
@@ -164,7 +168,7 @@ const Index = () => {
 
     try {
       const pyodide = pyodideRef.current;
-      
+
       // Capture stdout and stderr
       let outputBuffer = "";
       pyodide.setStdout({
@@ -199,7 +203,7 @@ plt.clf()
 
       // Run the Python code
       await pyodide.runPythonAsync(code);
-      
+
       // Capture any matplotlib figures
       const figures = await pyodide.runPythonAsync(`
 import matplotlib.pyplot as plt
@@ -215,11 +219,11 @@ for i in plt.get_fignums():
 plt.close('all')
 figures
       `);
-      
+
       if (figures && figures.length > 0) {
         setGraphicsOutput(figures.toJs());
       }
-      
+
       setOutput(outputBuffer || "Code executed successfully with no output.");
       toast.success("Code executed!");
     } catch (error: any) {
@@ -244,21 +248,36 @@ figures
     toast.success("Code reset to default!");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const filename = `pytecode${day}${month}.py`;
-    
-    const blob = new Blob([code], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-    
-    toast.success(`File saved as ${filename}`);
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const filename = `pytecode_${day}${month}.py`;
+
+    if (Capacitor.getPlatform() === "android") {
+      try {
+        await Filesystem.writeFile({
+          path: `PyteCode/${filename}`,
+          data: code,
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8,
+          recursive: true,
+        });
+        toast.success(`File saved to Documents/PyteCode/${filename}`);
+      } catch (e) {
+        console.error("Unable to write file", e);
+        toast.error("Error saving file");
+      }
+    } else {
+      const blob = new Blob([code], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(`File saved as ${filename}`);
+    }
   };
 
   const handleLibrariesChange = (libraries: string[]) => {
@@ -266,52 +285,28 @@ figures
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-auto">
       {/* Animated background gradients */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+        <div
+          className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: "1s" }}
+        />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl animate-glow" />
       </div>
 
-      <Header 
+      <Header
         selectedLibraries={selectedLibraries}
         onLibrariesChange={handleLibrariesChange}
       />
 
       {/* Welcome Dialog */}
-      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-3">
-              <img src={PythonLogo} alt="Python Logo" className="w-6 h-6" />
-              Welcome to PyteCode!
-            </DialogTitle>
-            <DialogDescription className="text-base space-y-4 pt-4">
-              <p>
-                PyteCode is a powerful Python IDE that runs entirely in your browser. 
-                Write, execute, and visualize Python code with zero setup required.
-              </p>
-              
-              <div className="space-y-3">
-                <p className="font-semibold text-foreground">Key Features:</p>
-                <ul className="list-disc list-inside space-y-2 ml-2 text-sm">
-                  <li><strong>Smart Editor:</strong> Syntax highlighting and auto-completion</li>
-                  <li><strong>Python Libraries:</strong> Use the settings menu (⚙️) to load NumPy, Pandas, Matplotlib, and more</li>
-                  <li><strong>Keyboard Shortcuts:</strong> Shift+Enter to run, Alt+R to reset, Ctrl+S to save</li>
-                  <li><strong>Progressive Web App:</strong> Install for offline access</li>
-                  <li><strong>Theme Options:</strong> Switch between light, dark, and system themes</li>
-                </ul>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end">
-            <Button onClick={handleStartCoding}>
-              Start Coding
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <WelcomeDialog
+        open={showWelcome}
+        setOpen={setShowWelcome}
+        onClick={handleStartCoding}
+      />
 
       <main className="container mx-auto px-4 py-6">
         <TooltipProvider>
@@ -320,21 +315,27 @@ figures
             <div className="flex gap-3">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
-                    onClick={handleRun} 
+                  <Button
+                    onClick={handleRun}
                     disabled={isRunning || isLoading}
                     size="lg"
                     className="shadow-glow hover:shadow-glow/70 transition-all"
                     aria-label="Run Python code"
                   >
                     <Play className="w-4 h-4" />
-                    {isLoading ? "Loading..." : isRunning ? "Running..." : "Run Code"}
+                    {isLoading
+                      ? "Loading..."
+                      : isRunning
+                        ? "Running..."
+                        : "Run Code"}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="flex items-center gap-2">
                     Execute your Python code
-                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Shift+Enter</kbd>
+                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                      Shift+Enter
+                    </kbd>
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -343,8 +344,8 @@ figures
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="glass" 
+                      <Button
+                        variant="glass"
                         size="lg"
                         aria-label="Reset code to default"
                       >
@@ -356,7 +357,9 @@ figures
                   <TooltipContent>
                     <p className="flex items-center gap-2">
                       Reset to default example code
-                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Alt+R</kbd>
+                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                        Alt+R
+                      </kbd>
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -364,34 +367,36 @@ figures
                   <AlertDialogHeader>
                     <AlertDialogTitle>Reset to Default Code?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will replace your current code with the default example. Any unsaved changes will be lost.
+                      This will replace your current code with the default
+                      example. Any unsaved changes will be lost.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleReset}>Reset</AlertDialogAction>
+                    <AlertDialogAction onClick={handleReset}>
+                      Reset
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-            
+
             <div className="flex gap-3">
               <AlertDialog>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="glass"
-                        aria-label="Clear all code"
-                      >
-                        <Trash2 className="w-4 h-4"/> Clear All
+                      <Button variant="glass" aria-label="Clear all code">
+                        <Trash2 className="w-4 h-4" /> Clear All
                       </Button>
                     </AlertDialogTrigger>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="flex items-center gap-2">
                       Clear all code and output
-                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Alt+Delete</kbd>
+                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                        Alt+Delete
+                      </kbd>
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -399,19 +404,22 @@ figures
                   <AlertDialogHeader>
                     <AlertDialogTitle>Clear All Code?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will delete all your code and clear the output. This action cannot be undone.
+                      This will delete all your code and clear the output. This
+                      action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleClear}>Clear All</AlertDialogAction>
+                    <AlertDialogAction onClick={handleClear}>
+                      Clear All
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
+                  <Button
                     variant="secondary"
                     onClick={handleSave}
                     aria-label="Save code to file"
@@ -423,28 +431,31 @@ figures
                 <TooltipContent>
                   <p className="flex items-center gap-2">
                     Download code as .py file
-                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">Ctrl+S</kbd>
+                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                      Ctrl+S
+                    </kbd>
                   </p>
                 </TooltipContent>
               </Tooltip>
             </div>
           </div>
 
-        {/* Editor and Output Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-220px)]">
-          <div className="h-full">
-            <CodeEditor value={code} onChange={setCode} />
+          {/* Editor and Output Grid */}
+          <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-220px)]">
+            <div className="h-full">
+              <CodeEditor value={code} onChange={setCode} />
+            </div>
+            <div className="h-full">
+              <OutputConsole output={output} graphicsOutput={graphicsOutput} />
+            </div>
           </div>
-          <div className="h-full">
-            <OutputConsole output={output} graphicsOutput={graphicsOutput} />
-          </div>
-        </div>
 
           {/* Info Card */}
-          {!isInstalled && (
+          {!isInstalled && Capacitor.getPlatform() !== "android" && (
             <div className="mt-6 p-4 rounded-2xl bg-gradient-primary backdrop-blur-glass border border-glass-border/30 shadow-glass">
               <p className="text-sm text-center text-foreground/80">
-                💡 <strong>Tip:</strong> PyteCode is a Progressive Web App. Install it on your device for a native app experience!
+                💡 <strong>Tip:</strong> PyteCode is a Progressive Web App.
+                Install it on your device for a native app experience!
               </p>
             </div>
           )}
