@@ -28,6 +28,11 @@ import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import WelcomeDialog from "@/components/WelcomeDialog";
 
+// Check if device has touch capability
+const hasTouchScreen = () => {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+};
+
 const AVAILABLE_LIBRARIES = [
   { id: "numpy", name: "NumPy", description: "Numerical computing" },
   {
@@ -65,6 +70,11 @@ const Index = () => {
   const pyodideRef = useRef<PyodideInterface | null>(null);
   const isInstalled = usePWAInstall();
   const [pyodideReady, setPyodideReady] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setIsTouchDevice(hasTouchScreen());
+  }, []);
 
   // Show welcome dialog on every visit
   useEffect(() => {
@@ -313,56 +323,86 @@ figures
           {/* Control Panel */}
           <div className="mb-6 flex flex-wrap gap-3 items-center justify-between">
             <div className="flex gap-3">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleRun}
-                    disabled={isRunning || isLoading}
-                    size="lg"
-                    className="shadow-glow hover:shadow-glow/70 transition-all"
-                    aria-label="Run Python code"
-                  >
-                    <Play className="w-4 h-4" />
-                    {isLoading
-                      ? "Loading..."
-                      : isRunning
-                        ? "Running..."
-                        : "Run Code"}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="flex items-center gap-2">
-                    Execute your Python code
-                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
-                      Shift+Enter
-                    </kbd>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-
-              <AlertDialog>
+              {isTouchDevice ? (
+                <Button
+                  onClick={handleRun}
+                  disabled={isRunning || isLoading}
+                  size="lg"
+                  className="shadow-glow hover:shadow-glow/70 transition-all"
+                  aria-label="Run Python code"
+                >
+                  <Play className="w-4 h-4" />
+                  {isLoading
+                    ? "Loading..."
+                    : isRunning
+                      ? "Running..."
+                      : "Run Code"}
+                </Button>
+              ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="glass"
-                        size="lg"
-                        aria-label="Reset code to default"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                        Reset
-                      </Button>
-                    </AlertDialogTrigger>
+                    <Button
+                      onClick={handleRun}
+                      disabled={isRunning || isLoading}
+                      size="lg"
+                      className="shadow-glow hover:shadow-glow/70 transition-all"
+                      aria-label="Run Python code"
+                    >
+                      <Play className="w-4 h-4" />
+                      {isLoading
+                        ? "Loading..."
+                        : isRunning
+                          ? "Running..."
+                          : "Run Code"}
+                    </Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="flex items-center gap-2">
-                      Reset to default example code
+                      Execute your Python code
                       <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
-                        Alt+R
+                        Shift+Enter
                       </kbd>
                     </p>
                   </TooltipContent>
                 </Tooltip>
+              )}
+
+              <AlertDialog>
+                {isTouchDevice ? (
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="glass"
+                      size="lg"
+                      aria-label="Reset code to default"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Reset
+                    </Button>
+                  </AlertDialogTrigger>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="glass"
+                          size="lg"
+                          aria-label="Reset code to default"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          Reset
+                        </Button>
+                      </AlertDialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="flex items-center gap-2">
+                        Reset to default example code
+                        <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                          Alt+R
+                        </kbd>
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Reset to Default Code?</AlertDialogTitle>
@@ -383,23 +423,31 @@ figures
 
             <div className="flex gap-3">
               <AlertDialog>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="glass" aria-label="Clear all code">
-                        <Trash2 className="w-4 h-4" /> Clear All
-                      </Button>
-                    </AlertDialogTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="flex items-center gap-2">
-                      Clear all code and output
-                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
-                        Alt+Delete
-                      </kbd>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+                {isTouchDevice ? (
+                  <AlertDialogTrigger asChild>
+                    <Button variant="glass" aria-label="Clear all code">
+                      <Trash2 className="w-4 h-4" /> Clear All
+                    </Button>
+                  </AlertDialogTrigger>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="glass" aria-label="Clear all code">
+                          <Trash2 className="w-4 h-4" /> Clear All
+                        </Button>
+                      </AlertDialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="flex items-center gap-2">
+                        Clear all code and output
+                        <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                          Alt+Delete
+                        </kbd>
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Clear All Code?</AlertDialogTitle>
@@ -417,26 +465,37 @@ figures
                 </AlertDialogContent>
               </AlertDialog>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    onClick={handleSave}
-                    aria-label="Save code to file"
-                  >
-                    <Download className="w-4 h-4" />
-                    Save
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="flex items-center gap-2">
-                    Download code as .py file
-                    <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
-                      Ctrl+S
-                    </kbd>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+              {isTouchDevice ? (
+                <Button
+                  variant="secondary"
+                  onClick={handleSave}
+                  aria-label="Save code to file"
+                >
+                  <Download className="w-4 h-4" />
+                  Save
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      onClick={handleSave}
+                      aria-label="Save code to file"
+                    >
+                      <Download className="w-4 h-4" />
+                      Save
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="flex items-center gap-2">
+                      Download code as .py file
+                      <kbd className="px-2 py-0.5 text-xs bg-muted rounded border">
+                        Ctrl+S
+                      </kbd>
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </div>
 

@@ -38,9 +38,11 @@ export const Header = ({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 backdrop-blur-sm">
-            <span className="text-xs font-medium text-primary">Beta</span>
-          </div>
+          {!isInstalled && Capacitor.getPlatform() !== "android" && (
+            <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 backdrop-blur-sm">
+              <span className="text-xs font-medium text-primary">Beta</span>
+            </div>
+          )}
           {!isInstalled && Capacitor.getPlatform() !== "android" && (
             <Button
               variant="glass"
