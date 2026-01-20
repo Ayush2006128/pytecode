@@ -24,8 +24,6 @@ import {
 import { Play, RotateCcw, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadPyodide, type PyodideInterface } from "pyodide";
-import { Capacitor } from "@capacitor/core";
-import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import WelcomeDialog from "@/components/WelcomeDialog";
 
 // Check if device has touch capability
@@ -264,30 +262,14 @@ figures
     const month = String(now.getMonth() + 1).padStart(2, "0");
     const filename = `pytecode_${day}${month}.py`;
 
-    if (Capacitor.getPlatform() === "android") {
-      try {
-        await Filesystem.writeFile({
-          path: `PyteCode/${filename}`,
-          data: code,
-          directory: Directory.Documents,
-          encoding: Encoding.UTF8,
-          recursive: true,
-        });
-        toast.success(`File saved to Documents/PyteCode/${filename}`);
-      } catch (e) {
-        console.error("Unable to write file", e);
-        toast.error("Error saving file");
-      }
-    } else {
-      const blob = new Blob([code], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      link.click();
-      URL.revokeObjectURL(url);
-      toast.success(`File saved as ${filename}`);
-    }
+    const blob = new Blob([code], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`File saved as ${filename}`);
   };
 
   const handleLibrariesChange = (libraries: string[]) => {
@@ -510,7 +492,7 @@ figures
           </div>
 
           {/* Info Card */}
-          {!isInstalled && Capacitor.getPlatform() !== "android" && (
+          {!isInstalled && (
             <div className="mt-6 p-4 rounded-2xl bg-gradient-primary backdrop-blur-glass border border-glass-border/30 shadow-glass">
               <p className="text-sm text-center text-foreground/80">
                 💡 <strong>Tip:</strong> PyteCode is a Progressive Web App.

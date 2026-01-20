@@ -8,7 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Settings as SettingsIcon } from "lucide-react";
 import PythonLogo from "@/assets/PythonLogo.svg";
-import { Capacitor } from "@capacitor/core";
 
 interface WelcomeDialogProps {
   open: boolean;
@@ -23,7 +22,7 @@ export default function WelcomeDialog({
 }: WelcomeDialogProps) {
   return (
     <Dialog
-      open={open && Capacitor.getPlatform() !== "android"}
+      open={open}
       onOpenChange={setOpen}
     >
       <DialogContent className="max-w-2xl">

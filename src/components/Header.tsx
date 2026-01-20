@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
 import { Settings } from "@/components/Settings";
 import { PythonLogo } from "@/components/PythonLogo";
-import { Capacitor } from "@capacitor/core";
 
 interface HeaderProps {
   selectedLibraries?: string[];
@@ -38,12 +37,12 @@ export const Header = ({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {!isInstalled && Capacitor.getPlatform() !== "android" && (
+          {!isInstalled && (
             <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/30 backdrop-blur-sm">
               <span className="text-xs font-medium text-primary">Beta</span>
             </div>
           )}
-          {!isInstalled && Capacitor.getPlatform() !== "android" && (
+          {!isInstalled && (
             <Button
               variant="glass"
               size="sm"
